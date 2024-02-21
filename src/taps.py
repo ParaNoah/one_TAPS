@@ -90,7 +90,7 @@ def update_S(T, S, scan):
             
     return S, scan
 
-def taps(trace):
+def TAPS(trace):
     trace = trace.sort_values('EndTime', ascending = True).reset_index(drop=True) #trie le DataFrame par ordre décroissant de EndTime et le réindex
     T = [] #Temp cache
     S = [] #list of sources undertest
@@ -110,7 +110,7 @@ def taps(trace):
             #print(f'old_t = {old_t}')
             t = datetime.datetime.fromtimestamp(old_t.timestamp() + N)
             #print(f't = {t}')
-            trace_subset = trace[trace["EndTime"] < t][old_t <= trace["EndTime"]]
+            trace_subset = trace[list((trace["EndTime"] < t) & (old_t <= trace["EndTime"]))]
         else :
             S, scan = update_S(T, S, scan)
             #print(f'S = {S}')
@@ -121,8 +121,7 @@ def taps(trace):
             #print(f't = {t}')
             if trace_subset.shape[0] != 0:
                 last_ind = trace_subset[trace_subset["EndTime"] == trace_subset["EndTime"].max()].index[0] + 1
-            trace_subset_inf = trace[trace["EndTime"] < t]
-            trace_subset = trace_subset_inf[trace["EndTime"] >= old_t]
+            trace_subset = trace[list((trace["EndTime"] < t) & (old_t <= trace["EndTime"]))]
             T = []
     
     return scan
