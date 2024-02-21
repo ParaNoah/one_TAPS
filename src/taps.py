@@ -90,7 +90,7 @@ def update_S(T, S, scan):
             
     return S, scan
 
-def TAPS(trace):
+def taps(trace):
     trace = trace.sort_values('EndTime', ascending = True).reset_index(drop=True) #trie le DataFrame par ordre décroissant de EndTime et le réindex
     T = [] #Temp cache
     S = [] #list of sources undertest
@@ -104,17 +104,21 @@ def TAPS(trace):
         for i in range(len(trace_subset)):
             flow = trace_subset.iloc[i]
             T = update_T(flow, T)
-        print(f'T = {T}')
+        #print(f'T = {T}')
         if T == [] and S == []:
             old_t = trace.iloc[last_ind]["EndTime"]
-            t = datetime.datetime.utcfromtimestamp(old_t.timestamp() + N)
+            #print(f'old_t = {old_t}')
+            t = datetime.datetime.fromtimestamp(old_t.timestamp() + N)
+            #print(f't = {t}')
             trace_subset = trace[trace["EndTime"] < t][old_t <= trace["EndTime"]]
         else :
             S, scan = update_S(T, S, scan)
-            print(f'S = {S}')
-            print(f'scan = {scan}')
+            #print(f'S = {S}')
+            #print(f'scan = {scan}')
             old_t = t
-            t = datetime.datetime.utcfromtimestamp(old_t.timestamp()+N)
+            #print(f'old_t = {old_t}')
+            t = datetime.datetime.fromtimestamp(old_t.timestamp()+N)
+            #print(f't = {t}')
             if trace_subset.shape[0] != 0:
                 last_ind = trace_subset[trace_subset["EndTime"] == trace_subset["EndTime"].max()].index[0] + 1
             trace_subset_inf = trace[trace["EndTime"] < t]
