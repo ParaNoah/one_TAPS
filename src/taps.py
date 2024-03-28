@@ -50,7 +50,7 @@ def update_scan(S, scan):
     return S, scan
 
 # S = [[SrcAddr,Likelihood ratio]]
-def update_S(T, S, scan):
+def update_S(T, S, scan, K = K):
     # Update ST
     for record in T:
         is_in_S = False
@@ -90,7 +90,7 @@ def update_S(T, S, scan):
             
     return S, scan
 
-def TAPS(trace):
+def TAPS(trace, N = N, K = K):
     trace = trace.sort_values('EndTime', ascending = True).reset_index(drop=True) #trie le DataFrame par ordre décroissant de EndTime et le réindex
     T = [] #Temp cache
     S = [] #list of sources undertest
@@ -108,11 +108,11 @@ def TAPS(trace):
         if T == [] and S == []:
             old_t = trace.iloc[last_ind]["EndTime"]
             #print(f'old_t = {old_t}')
-            t = datetime.datetime.fromtimestamp(old_t.timestamp() + N)
+            t = datetime.datetime.utcfromtimestamp(old_t.timestamp() + N)
             #print(f't = {t}')
             trace_subset = trace[list((trace["EndTime"] < t) & (old_t <= trace["EndTime"]))]
         else :
-            S, scan = update_S(T, S, scan)
+            S, scan = update_S(T, S, scan, K)
             #print(f'S = {S}')
             #print(f'scan = {scan}')
             old_t = t
